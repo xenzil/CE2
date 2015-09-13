@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 
 public class TextBuddy {
@@ -75,6 +77,11 @@ public class TextBuddy {
 			feedback = addText(restOfLine);
 			break;
 		
+		//sorts text file alphabetically
+		case "sort":
+			feedback = sortFile();
+			break;
+			
 		case "exit":
 			System.exit(0);
 		default: feedback.add("unknown command");
@@ -101,7 +108,30 @@ public class TextBuddy {
 		feedback.add(String.format(WELCOME_MESSAGE, fileName));
 		return feedback;
 	}
-
+	
+	//method to sort file
+	public static ArrayList<String> sortFile() throws IOException{
+		ArrayList<String> feedback = new ArrayList<String>();
+		
+		File tempFile = file;
+		BufferedReader tempReader = new BufferedReader(new FileReader(tempFile));
+		String line;
+		ArrayList<String> sortedList = new ArrayList<String>();
+		while ((line = tempReader.readLine()) != null) {
+			sortedList.add(line);
+		}
+		Collections.sort(sortedList);
+		
+		BufferedWriter mainWriter = new BufferedWriter(new FileWriter(file,false));
+		for (String textLine : sortedList){
+			mainWriter.write(textLine + System.getProperty("line.separator"));
+		}
+		tempReader.close();
+		mainWriter.flush();
+		
+		return feedback;
+	}
+	
 	// method to clear file
 	public static ArrayList<String> clearFile() throws IOException {
 		BufferedWriter mainWriter = new BufferedWriter(new FileWriter(file, false));
