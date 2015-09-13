@@ -81,6 +81,8 @@ public class TextBuddy {
 		case "sort":
 			feedback = sortFile();
 			break;
+		
+
 			
 		case "exit":
 			System.exit(0);
@@ -128,12 +130,12 @@ public class TextBuddy {
 		}
 		tempReader.close();
 		mainWriter.flush();
-		
-		feedback = displayFile();
-		feedback.add(0,"List has been sorted alphabetically. Here is the new list");
+		feedback.add("List has been sorted alphabetically");
 		
 		return feedback;
 	}
+	
+	
 	
 	// method to clear file
 	public static ArrayList<String> clearFile() throws IOException {
