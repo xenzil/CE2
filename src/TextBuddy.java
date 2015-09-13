@@ -24,6 +24,8 @@ public class TextBuddy {
 	private static final String DISPLAY_EMPTY_MESSAGE = "%s is empty";
 	private static final String DELETE_MESSAGE = "deleted from %1$s: \"%2$s\"";
 	private static final String COMMAND_MESSAGE = "command: ";
+	private static final String SORTED_MESSAGE = "List has been sorted alphabetically";
+	private static final String SEARCH_MESSAGE = "Search Results";
 
 	public static void main(String[] args) {
 		scanner = new Scanner(System.in);
@@ -133,7 +135,7 @@ public class TextBuddy {
 		}
 		tempReader.close();
 		mainWriter.flush();
-		feedback.add("List has been sorted alphabetically");
+		feedback.add(SORTED_MESSAGE);
 		
 		return feedback;
 	}
@@ -164,7 +166,7 @@ public class TextBuddy {
 			
 		}
 		tempReader.close();
-		feedback.add(0,"Search Results");
+		feedback.add(0,SEARCH_MESSAGE);
 		
 		return feedback;
 	}
