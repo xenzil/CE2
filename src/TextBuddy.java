@@ -82,7 +82,10 @@ public class TextBuddy {
 			feedback = sortFile();
 			break;
 		
-
+		//search text file for keyword
+		case "search":
+			feedback = searchWord("restOfLine");
+			break;
 			
 		case "exit":
 			System.exit(0);
@@ -135,7 +138,24 @@ public class TextBuddy {
 		return feedback;
 	}
 	
-	
+	//method to search word
+	public static ArrayList<String> searchWord(String keyword) throws IOException{
+		ArrayList<String> feedback = new ArrayList<String>();
+		File tempFile = file;
+		String line;
+
+		BufferedReader tempReader = new BufferedReader(new FileReader(tempFile));
+		while ((line = tempReader.readLine()) != null) {
+			String boolLine = line;
+			if(boolLine.contains(keyword)){
+				feedback.add(line);
+			}
+		}
+		tempReader.close();
+		feedback.add(0,"Search Results");
+		
+		return feedback;
+	}
 	
 	// method to clear file
 	public static ArrayList<String> clearFile() throws IOException {
