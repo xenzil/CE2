@@ -29,6 +29,12 @@ public class TextBuddyTest extends TextBuddy {
 		expected.add("3. in the sea");
 		testOneCommand("display first", expected, "display", "");
 		
+		expected = new ArrayList<String>();
+		expected.add("List has been sorted alphabetically. Here is the new list");
+		expected.add("1. ate a bunny");
+		expected.add("2. in the sea");
+		expected.add("3. little brown fox");
+		testOneCommand("display sorted", expected, "sort", "");
 	}
 
 	private void testOneCommand(String description, ArrayList<String> expected, String command, String restOfLine) throws IOException {
