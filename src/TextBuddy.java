@@ -129,6 +129,9 @@ public class TextBuddy {
 		tempReader.close();
 		mainWriter.flush();
 		
+		feedback = displayFile();
+		feedback.add(0,"List has been sorted alphabetically. Here is the new list");
+		
 		return feedback;
 	}
 	
