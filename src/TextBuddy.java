@@ -29,6 +29,7 @@ public class TextBuddy {
 		try {
 			feedback = openFile(args[0]);
 			showToUser(feedback);
+			
 			while (true) {
 				System.out.print(COMMAND_MESSAGE);
 				String command = scanner.next();
@@ -90,6 +91,7 @@ public class TextBuddy {
 	// method to create file and writers and readers
 	public static ArrayList<String> openFile(String givenName) throws IOException, FileNotFoundException {
 		fileName = givenName;
+		
 		file = new File(fileName);
 		if (!file.exists()) {
 			file.createNewFile();
@@ -101,7 +103,7 @@ public class TextBuddy {
 	}
 
 	// method to clear file
-	private static ArrayList<String> clearFile() throws IOException {
+	public static ArrayList<String> clearFile() throws IOException {
 		BufferedWriter mainWriter = new BufferedWriter(new FileWriter(file, false));
 
 		ArrayList<String> feedback = new ArrayList<String>();
