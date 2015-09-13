@@ -10,9 +10,6 @@ import java.util.Scanner;
 
 public class TextBuddy {
 
-	private static FileWriter fw;
-	private static BufferedWriter mainWriter;
-	private static BufferedReader mainReader;
 	private static String fileName;
 	private static File file;
 	private static Scanner scanner;
@@ -30,12 +27,13 @@ public class TextBuddy {
 		scanner = new Scanner(System.in);
 		ArrayList<String> feedback = new ArrayList<String>();
 		try {
-			feedback = openFile(args);
+			feedback = openFile(args[0]);
 			showToUser(feedback);
 			while (true) {
 				System.out.print(COMMAND_MESSAGE);
 				String command = scanner.next();
-				feedback = executeCommand(command, feedback);
+				String restOfLine = scanner.nextLine();
+				feedback = executeCommand(command, restOfLine);
 				showToUser(feedback);
 
 			}
@@ -51,10 +49,10 @@ public class TextBuddy {
 	 * @return
 	 * @throws IOException
 	 */
-	private static ArrayList<String> executeCommand(String command, ArrayList<String> feedback)
+	public static ArrayList<String> executeCommand(String command, String restOfLine)
 			throws IOException {
-
-		String restOfLine = scanner.nextLine();
+		ArrayList<String> feedback = new ArrayList<String>();
+		
 		switch (command) {
 		// delete file
 		case "delete":
@@ -90,15 +88,12 @@ public class TextBuddy {
 	}
 
 	// method to create file and writers and readers
-	private static ArrayList<String> openFile(String[] args) throws IOException, FileNotFoundException {
-		fileName = args[0];
+	public static ArrayList<String> openFile(String givenName) throws IOException, FileNotFoundException {
+		fileName = givenName;
 		file = new File(fileName);
 		if (!file.exists()) {
 			file.createNewFile();
 		}
-		fw = new FileWriter(file.getAbsoluteFile(), true);
-		mainWriter = new BufferedWriter(fw);
-		mainReader = new BufferedReader(new FileReader(file));
 
 		ArrayList<String> feedback = new ArrayList<String>();
 		feedback.add(String.format(WELCOME_MESSAGE, fileName));
@@ -107,17 +102,18 @@ public class TextBuddy {
 
 	// method to clear file
 	private static ArrayList<String> clearFile() throws IOException {
-		mainWriter = new BufferedWriter(new FileWriter(file, false));
-		mainWriter.flush();
+		BufferedWriter mainWriter = new BufferedWriter(new FileWriter(file, false));
 
 		ArrayList<String> feedback = new ArrayList<String>();
 		feedback.add(String.format(CLEAR_FILE_MESSAGE, fileName));
+		mainWriter.flush();
 		return feedback;
 	}
 
 	// method to add text
 	private static ArrayList<String> addText(String text) throws IOException {
 		text = text.substring(1, text.length());
+		BufferedWriter mainWriter = new BufferedWriter(new FileWriter(file, true));
 		mainWriter.write(text + System.getProperty("line.separator"));
 		mainWriter.flush();
 
@@ -152,7 +148,7 @@ public class TextBuddy {
 
 	// method to delete line
 	private static ArrayList<String> deleteLine(String indexString) throws IOException {
-		mainReader = new BufferedReader(new FileReader(file));
+		BufferedReader mainReader = new BufferedReader(new FileReader(file));
 		String currentLine;
 		int listIndex = 1;
 		indexString = indexString.trim();
@@ -179,6 +175,7 @@ public class TextBuddy {
 		}
 		clearFile();
 
+		BufferedWriter mainWriter = new BufferedWriter(new FileWriter(file, false));
 		for (String textLine : remainingText) {
 			mainWriter.write(textLine + System.getProperty("line.separator"));
 		}
