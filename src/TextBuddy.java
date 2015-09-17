@@ -12,6 +12,7 @@ import java.util.Scanner;
 
 public class TextBuddy {
 
+	
 	private static String fileName;
 	private static File file;
 	private static Scanner scanner;
@@ -26,25 +27,43 @@ public class TextBuddy {
 	private static final String COMMAND_MESSAGE = "command: ";
 	private static final String SORTED_MESSAGE = "List has been sorted alphabetically";
 	private static final String SEARCH_MESSAGE = "Search Results";
+	private static final String INVALID_INTEGER_MESSAGE = "invalid integer";
+	private static final String UNKNOWN_COMMAND_MESSAGE = "unknown command";
+	private static final String COMMAND_EXIT = "exit";
+	private static final String COMMAND_SEARCH = "search";
+	private static final String COMMAND_SORT = "sort";
+	private static final String COMMAND_ADD = "add";
+	private static final String COMMAND_CLEAR = "clear";
+	private static final String COMMAND_DISPLAY = "display";
+	private static final String COMMAND_DELETE = "delete";
+	private static String commandFirstWord;
+	private static String commandRestOfLine;
 
 	public static void main(String[] args) {
 		scanner = new Scanner(System.in);
 		ArrayList<String> feedback = new ArrayList<String>();
 		try {
 			feedback = openFile(args[0]);
-			showToUser(feedback);
-			
+			showToUser(feedback);		
 			while (true) {
-				System.out.print(COMMAND_MESSAGE);
-				String command = scanner.next();
-				String restOfLine = scanner.nextLine();
-				feedback = executeCommand(command, restOfLine);
+				printCommandMessage();
+				readCommand();
+				feedback = executeCommand(commandFirstWord, commandRestOfLine);
 				showToUser(feedback);
-
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static void printCommandMessage() {
+		System.out.print(COMMAND_MESSAGE);
+	}
+
+	private static void readCommand() {
+		String command = scanner.nextLine();
+		commandFirstWord = command.substring(0, command.indexOf(" "));
+		commandRestOfLine = command.substring(command.indexOf(" "),command.length());
 	}
 
 	/**
@@ -60,45 +79,45 @@ public class TextBuddy {
 		
 		switch (command) {
 		// delete file
-		case "delete":
+		case COMMAND_DELETE:
 			feedback = deleteLine(restOfLine);
 			break;
 
 		// display file, say empty if empty
-		case "display":
+		case COMMAND_DISPLAY:
 			feedback = displayFile();
 			break;
 
 		// clear file and print
-		case "clear":
+		case COMMAND_CLEAR:
 			feedback = clearFile();
 			break;
 
 		// add text and print
-		case "add":
+		case COMMAND_ADD:
 			feedback = addText(restOfLine);
 			break;
 		
 		//sorts text file alphabetically
-		case "sort":
+		case COMMAND_SORT:
 			feedback = sortFile();
 			break;
 		
 		//search text file for keyword
-		case "search":
+		case COMMAND_SEARCH:
 			feedback = searchWord(restOfLine);
 			break;
 			
-		case "exit":
+		case COMMAND_EXIT:
 			System.exit(0);
-		default: feedback.add("unknown command");
+		default: feedback.add(UNKNOWN_COMMAND_MESSAGE);
 		}
 		return feedback;
 	}
 
-	private static void showToUser(ArrayList<String> feedback) {
-		while (!feedback.isEmpty()) {
-			System.out.println(feedback.remove(0));
+	private static void showToUser(ArrayList<String> feedbackLines) {
+		while (!feedbackLines.isEmpty()) {
+			System.out.println(feedbackLines.remove(0));
 		}
 	}
 
@@ -218,22 +237,39 @@ public class TextBuddy {
 
 	// method to delete line
 	private static ArrayList<String> deleteLine(String indexString) throws IOException {
-		BufferedReader mainReader = new BufferedReader(new FileReader(file));
-		String currentLine;
-		int listIndex = 1;
-		indexString = indexString.trim();
+		ArrayList<String> feedback = new ArrayList<String>();		
 		int index = 0;
-		ArrayList<String> feedback = new ArrayList<String>();
 
 		// catch if non-integer is used
 		try {
 			index = Integer.parseInt(indexString);
 		} catch (NumberFormatException e) {
-			feedback.add("invalid integer");
+			feedback.add(INVALID_INTEGER_MESSAGE);
 			return feedback;
 		}
+	
+		ArrayList<String> remainingText = getUndeletedLines(indexString, feedback, index);
+		clearFile();
+		writeUndeletedLines(remainingText);
 
+		return feedback;
+	}
+
+	private static void writeUndeletedLines(ArrayList<String> remainingText) throws IOException {
+		BufferedWriter mainWriter = new BufferedWriter(new FileWriter(file, false));
+		for (String textLine : remainingText) {
+			mainWriter.write(textLine + System.getProperty("line.separator"));
+		}
+		mainWriter.flush();
+	}
+
+	private static ArrayList<String> getUndeletedLines(String indexString, ArrayList<String> feedback, int index)
+			throws FileNotFoundException, IOException {
 		ArrayList<String> remainingText = new ArrayList<String>();
+		BufferedReader mainReader = new BufferedReader(new FileReader(file));
+		String currentLine;
+		indexString = indexString.trim();
+		int listIndex = 1;
 		while ((currentLine = mainReader.readLine()) != null) {
 			if (listIndex == index) {
 				feedback.add(String.format(DELETE_MESSAGE, fileName, currentLine));
@@ -243,13 +279,6 @@ public class TextBuddy {
 			listIndex++;
 			remainingText.add(currentLine);
 		}
-		clearFile();
-
-		BufferedWriter mainWriter = new BufferedWriter(new FileWriter(file, false));
-		for (String textLine : remainingText) {
-			mainWriter.write(textLine + System.getProperty("line.separator"));
-		}
-		mainWriter.flush();
-		return feedback;
+		return remainingText;
 	}
 }
