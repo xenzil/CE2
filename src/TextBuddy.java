@@ -17,7 +17,6 @@ public class TextBuddy {
 	private static File file;
 	private static Scanner scanner;
 
-	// list of messages
 	private static final String WELCOME_MESSAGE = "Welcome to TextBuddy. %s is ready for use";
 	private static final String CLEAR_FILE_MESSAGE = "all content deleted from %s";
 	private static final String ADD_TEXT_MESSAGE = "added to %1$s: \"%2$s\"";
@@ -131,6 +130,7 @@ public class TextBuddy {
 		}
 
 		ArrayList<String> feedback = new ArrayList<String>();
+		
 		feedback.add(String.format(WELCOME_MESSAGE, fileName));
 		return feedback;
 	}
@@ -139,58 +139,74 @@ public class TextBuddy {
 	public static ArrayList<String> sortFile() throws IOException{
 		ArrayList<String> feedback = new ArrayList<String>();
 		
-		File tempFile = file;
-		BufferedReader tempReader = new BufferedReader(new FileReader(tempFile));
-		String line;
 		ArrayList<String> sortedList = new ArrayList<String>();
-		while ((line = tempReader.readLine()) != null) {
-			sortedList.add(line);
-		}
-		Collections.sort(sortedList);
+		BufferedReader tempReader = readFileIntoArrayList(sortedList);	
+		sortArrayList(sortedList);		
+		rewriteSortedList(sortedList, tempReader);
 		
+		feedback.add(SORTED_MESSAGE);		
+		return feedback;
+	}
+
+	private static void rewriteSortedList(ArrayList<String> sortedList, BufferedReader tempReader)
+			throws IOException {
 		BufferedWriter mainWriter = new BufferedWriter(new FileWriter(file,false));
 		for (String textLine : sortedList){
 			mainWriter.write(textLine + System.getProperty("line.separator"));
 		}
 		tempReader.close();
 		mainWriter.flush();
-		feedback.add(SORTED_MESSAGE);
+	}
+
+	private static void sortArrayList(ArrayList<String> sortedList) {
+		Collections.sort(sortedList);
+	}
+
+	private static BufferedReader readFileIntoArrayList(ArrayList<String> sortedList)
+			throws FileNotFoundException, IOException {
+		BufferedReader tempReader = readFile();
+		String line;
 		
-		return feedback;
+		while ((line = tempReader.readLine()) != null) {
+			sortedList.add(line);
+		}
+		return tempReader;
 	}
 	
-	//method to search word
 	public static ArrayList<String> searchWord(String keyword) throws IOException{
 		ArrayList<String> feedback = new ArrayList<String>();
-		File tempFile = file;
-		String line;
-		String tempLine;
-		keyword = keyword.trim();
-
-		BufferedReader tempReader = new BufferedReader(new FileReader(tempFile));
-		while ((line = tempReader.readLine()) != null) {
-			tempLine = line;
-
-			String[] words = tempLine.split(" ");
-
-			for	(int i=0; i < words.length; i++){
-
-				//System.out.println(words[i]);
-				
-				if(keyword.equals(words[i])){
-					feedback.add(line);
-					break;
-				}
-			}
-			
-		}
-		tempReader.close();
+		BufferedReader tempReader = readFile();
+		
+		addSearchedLinesToFeedback(keyword, feedback, tempReader);
 		feedback.add(0,SEARCH_MESSAGE);
 		
 		return feedback;
 	}
+
+	private static void addSearchedLinesToFeedback(String keyword, ArrayList<String> feedback,
+			BufferedReader tempReader) throws IOException {
+		keyword = keyword.trim();
+		String line;
+		String tempLine;
+		while ((line = tempReader.readLine()) != null) {
+			tempLine = line;
+			String[] words = tempLine.split(" ");
+			for	(int i=0; i < words.length; i++){				
+				if(keyword.equals(words[i])){
+					feedback.add(line);
+					break;
+				}
+			}	
+		}
+		tempReader.close();
+	}
+
+	private static BufferedReader readFile() throws FileNotFoundException {
+		File tempFile = file;
+		BufferedReader tempReader = new BufferedReader(new FileReader(tempFile));
+		return tempReader;
+	}
 	
-	// method to clear file
 	public static ArrayList<String> clearFile() throws IOException {
 		BufferedWriter mainWriter = new BufferedWriter(new FileWriter(file, false));
 
@@ -200,42 +216,50 @@ public class TextBuddy {
 		return feedback;
 	}
 
-	// method to add text
 	private static ArrayList<String> addText(String text) throws IOException {
+		ArrayList<String> feedback = new ArrayList<String>();
 		text = text.substring(1, text.length());
 		BufferedWriter mainWriter = new BufferedWriter(new FileWriter(file, true));
 		mainWriter.write(text + System.getProperty("line.separator"));
 		mainWriter.flush();
-
-		ArrayList<String> feedback = new ArrayList<String>();
 		feedback.add(String.format(ADD_TEXT_MESSAGE, fileName, text));
+		
 		return feedback;
 	}
 
-	// method to display text
 	private static ArrayList<String> displayFile() throws IOException {
+		ArrayList<String> feedback = new ArrayList<String>();	
+		
+		int listIndex = readTextFile(feedback);		
+		checkEmptyFile(listIndex, feedback);
+		
+		return feedback;
+	}
+
+	private static int readTextFile(ArrayList<String> feedback) throws FileNotFoundException, IOException {
 		int listIndex = 1;
 		File tempFile = file;
 		String line;
-		String feedbackLine;
-		ArrayList<String> feedback = new ArrayList<String>();
+		String fileContent;
 
 		BufferedReader tempReader = new BufferedReader(new FileReader(tempFile));
 		while ((line = tempReader.readLine()) != null) {
-			feedbackLine = String.format(DISPLAY_FILE_MESSAGE, listIndex, line);
-			feedback.add(feedbackLine);
+			fileContent = String.format(DISPLAY_FILE_MESSAGE, listIndex, line);
+			feedback.add(fileContent);
 			listIndex++;
 		}
 		tempReader.close();
+		return listIndex;
+	}
 
+	private static void checkEmptyFile(int listIndex, ArrayList<String> feedback) {
+		String feedbackLine;
 		if (listIndex == 1) {
 			feedbackLine = String.format(DISPLAY_EMPTY_MESSAGE, fileName);
 			feedback.add(feedbackLine);
 		}
-		return feedback;
 	}
 
-	// method to delete line
 	private static ArrayList<String> deleteLine(String indexString) throws IOException {
 		ArrayList<String> feedback = new ArrayList<String>();		
 		int index = 0;
