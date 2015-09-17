@@ -16,7 +16,9 @@ public class TextBuddy {
 	private static String fileName;
 	private static File file;
 	private static Scanner scanner;
-
+	private static String commandFirstWord;
+	private static String commandRestOfLine;
+	
 	private static final String WELCOME_MESSAGE = "Welcome to TextBuddy. %s is ready for use";
 	private static final String CLEAR_FILE_MESSAGE = "all content deleted from %s";
 	private static final String ADD_TEXT_MESSAGE = "added to %1$s: \"%2$s\"";
@@ -35,8 +37,6 @@ public class TextBuddy {
 	private static final String COMMAND_CLEAR = "clear";
 	private static final String COMMAND_DISPLAY = "display";
 	private static final String COMMAND_DELETE = "delete";
-	private static String commandFirstWord;
-	private static String commandRestOfLine;
 
 	public static void main(String[] args) {
 		scanner = new Scanner(System.in);
